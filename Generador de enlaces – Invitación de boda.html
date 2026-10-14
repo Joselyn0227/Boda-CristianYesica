@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generador de enlaces | Invitación Cristian & Yessica</title>
+<style>
+:root{--bg:#f3f1eb;--ink:#4a5343;--soft:#6b7761;--gold:#b8962e;--line:#d9d3bf;--card:#fffdf7}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#262a22;--ink:#ece8da;--soft:#b5bda6;--gold:#d4af37;--line:#4b5242;--card:#30352a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,serif;padding:max(20px,env(safe-area-inset-top)) 18px 40px}
+main{max-width:640px;margin:0 auto}h1{font-weight:500;font-size:26px;margin:8px 0 4px}p.s{color:var(--soft);margin:0 0 22px}
+label{display:block;font-size:14px;color:var(--soft);margin:16px 0 6px}
+input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+textarea{min-height:130px}button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--gold);background:none;color:var(--ink);padding:8px 14px}
+button.p{background:var(--gold);color:#fff;margin-top:14px;padding:11px 20px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:10px}
+.row b{display:block;font-weight:600}.row code{display:block;font-size:12px;word-break:break-all;color:var(--soft);margin:4px 0 8px}
+.row div{display:flex;gap:8px;flex-wrap:wrap}.ok{color:var(--gold);font-size:14px;align-self:center}
+</style></head><body><main>
+<h1>Enlaces personalizados</h1>
+<p class="s">Escribe un invitado por línea y genera un enlace único para cada uno.</p>
+<label for="base">Enlace de la invitación</label>
+<input id="base" placeholder="https://tu-invitacion.netlify.app" inputmode="url">
+<label for="names">Invitados (uno por línea)</label>
+<textarea id="names" placeholder="María Gómez&#10;Familia Pérez&#10;Tío Carlos y Tía Luz"></textarea>
+<button class="p" id="go">Generar enlaces</button>
+<div id="out"></div>
+</main>
+<script>
+var out=document.getElementById('out');
+function mk(base,name){var u;try{u=new URL(base)}catch(e){return null}u.searchParams.set('para',name);return u.toString()}
+function copy(txt,ok){try{navigator.clipboard.writeText(txt).then(ok,function(){fb()})}catch(e){fb()}
+ function fb(){var t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();ok()}}
+document.getElementById('go').onclick=function(){
+ var base=document.getElementById('base').value.trim(),names=document.getElementById('names').value.split('\n').map(function(s){return s.trim()}).filter(Boolean);
+ out.textContent='';
+ if(!mk(base||'x','a')){out.textContent='Escribe el enlace completo, empezando por https://';return}
+ names.forEach(function(n){
+  var link=mk(base,n),r=document.createElement('div');r.className='row';
+  var b=document.createElement('b');b.textContent=n;var c=document.createElement('code');c.textContent=link;
+  var d=document.createElement('div'),cp=document.createElement('button'),wa=document.createElement('a'),ok=document.createElement('span');
+  cp.textContent='Copiar enlace';ok.className='ok';
+  cp.onclick=function(){copy(link,function(){ok.textContent='¡Copiado!';setTimeout(function(){ok.textContent=''},1800)})};
+  wa.href='https://wa.me/?text='+encodeURIComponent('Hola '+n+', con mucho amor te compartimos nuestra invitación: '+link);wa.target='_blank';wa.rel='noopener';
+  var wb=document.createElement('button');wb.textContent='Enviar por WhatsApp';wa.appendChild(wb);
+  d.append(cp,wa,ok);r.append(b,c,d);out.appendChild(r)});
+};
+</script></body></html>
